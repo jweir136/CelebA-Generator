@@ -13,7 +13,7 @@ class CelebADataset(data.Dataset):
     if training:
       self.filenames = os.listdir(self.img_dir)[:150000]
     else:
-      self.filenames = os.listdir(self.img_dir)[150000:]
+      self.filenames = os.listdir(self.img_dir)[150001:]
 
     if shuffle:
       self.filenames = utils.shuffle(self.filenames)

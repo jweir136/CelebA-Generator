@@ -20,6 +20,8 @@ class CelebAVAE(nn.Module):
   def __init__(self):
     super().__init__()
 
+    self.drop = nn.Dropout2d(p=0.2, inplace=True)
+
     self.encoder = nn.Sequential(
       nn.Conv2d(3, 16, 5),
       nn.ReLU(True),
@@ -35,10 +37,39 @@ class CelebAVAE(nn.Module):
     )
     self.mu_layer = nn.Linear(120, 2)
     self.logvar_layer = nn.Linear(120, 2)
+    self.decoder = nn.Sequential(
+      nn.Linear(2, 120),
+      nn.ReLU(True),
+      nn.Linear(120, 128*84*84),
+      nn.ReLU(True),
+      UnFlatten(),
+      nn.ConvTranspose2d(128, 64, 5),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(64, 32, 5),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(32, 16, 5),
+      nn.ReLU(True),
+      nn.ConvTranspose2d(16, 3, 5),
+      nn.Tanh()
+    )
+
+  def __reparam__(self, mu, logvar):
+    std = 0.5 * torch.exp(logvar)
+    epsilon = torch.rand_like(std)
+    return mu + std * epsilon
 
   def encode(self, x):
     x = self.encoder(x)
-    return x
+    mu, logvar = self.mu_layer(x), self.logvar_layer(x)
+    return x, mu, logvar
 
-  def forward(self, x):
-    return x
+  def decode(self, x):
+    return self.decoder(x)
+
+  def forward(self, x, training=False):
+    if training:
+      x = self.drop(x)
+    x, mu, logvar = self.encode(x)
+    z = self.__reparam__(mu, logvar)
+    x = self.decoder(z)
+    return x, mu, logvar
