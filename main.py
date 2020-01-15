@@ -102,3 +102,6 @@ for epoch in range(20):
     generated_img = np.moveaxis(generated_img, 0, -1)
     plt.imshow(generated_img)
     plt.savefig("generations/epoch-{}.png".format(epoch+1))
+
+# save the torch model
+torch.save(vae.state_dict(), "CelebA-VAE-State-Dict.pth")
