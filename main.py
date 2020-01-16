@@ -103,5 +103,24 @@ for epoch in range(20):
     plt.imshow(generated_img)
     plt.savefig("generations/epoch-{}.png".format(epoch+1))
 
+    # plot the latent space
+    counter = 0
+    limit = 2500
+    X = []
+    Y = []
+
+    for x, _ in testloader:
+      if counter >= limit:
+        break
+      x = x.cuda().float()
+      x_pred, mu, logvar = vae.forward(x)
+      z = vae.__reparam__(mu, logvar).detach().cpu().numpy()
+      X.append(z[:, 0])
+      Y.append(z[:, 1])
+      plt.clf()
+      plt.plot(X, Y, 'ro')
+      plt.savefig("visualizations/epoch-{}.png".format(epoch+1))
+      counter += len(x.detach().cpu().numpy())
+
 # save the torch model
 torch.save(vae.state_dict(), "CelebA-VAE-State-Dict.pth")

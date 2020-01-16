@@ -11,9 +11,9 @@ class CelebADataset(data.Dataset):
     self.df = df
 
     if training:
-      self.filenames = os.listdir(self.img_dir)[:150000]
+      self.filenames = os.listdir(self.img_dir)[:10000]
     else:
-      self.filenames = os.listdir(self.img_dir)[150001:]
+      self.filenames = os.listdir(self.img_dir)[10001:15000]
 
     if shuffle:
       self.filenames = utils.shuffle(self.filenames)

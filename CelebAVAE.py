@@ -20,7 +20,7 @@ class CelebAVAE(nn.Module):
   def __init__(self):
     super().__init__()
 
-    self.drop = nn.Dropout2d(p=0.2, inplace=True)
+    self.drop = nn.Dropout2d(p=0.25, inplace=True)
 
     self.encoder = nn.Sequential(
       nn.Conv2d(3, 16, 5),
